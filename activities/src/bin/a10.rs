@@ -13,20 +13,14 @@
 //   to print
 
 fn main() {
-    print_message(is_greater_than_100(10));
-    print_message(is_greater_than_100(100));
-    print_message(is_greater_than_100(1000));
+    print_description(10);
+    print_description(100);
+    print_description(1000);
 }
 
-fn is_greater_than_100(value: i32) -> bool {
-    if value > 100 {
-        true
-    } else {
-        false
-    }
-}
+fn print_description(value: i32) {
+    let is_greater = if value > 100 { true } else { false };
 
-fn print_message(is_greater: bool) {
     match is_greater {
         true => println!("it's big"),
         false => println!("it's small"),
