@@ -10,4 +10,18 @@
 // * Use a match expression to determine which message to display
 // * Use an underscore (_) to match on any value
 
-fn main() {}
+fn main() {
+    display_value(1);
+    display_value(2);
+    display_value(3);
+    display_value(100);
+}
+
+fn display_value(value: i32) {
+    match value {
+        1 => println!("one"),
+        2 => println!("two"),
+        3 => println!("three"),
+        _ => println!("other"),
+    }
+}
