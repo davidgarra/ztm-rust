@@ -16,14 +16,27 @@ enum Color {
     Blue,
 }
 
+struct Dimensions {
+    width: f64,
+    height: f64,
+    depth: f64,
+}
+impl Dimensions {
+    fn print(&self) {
+        println!(
+            "Width: {}\nHeight: {}\nDepth: {}",
+            self.width, self.height, self.depth
+        );
+    }
+}
+
 struct Box {
-    dimensions: (i32, i32, i32),
+    dimensions: Dimensions,
     weight: f64,
     color: Color,
 }
-
 impl Box {
-    fn new(dimensions: (i32, i32, i32), weight: f64, color: Color) -> Self {
+    fn new(dimensions: Dimensions, weight: f64, color: Color) -> Self {
         Self {
             dimensions,
             weight,
@@ -32,19 +45,22 @@ impl Box {
     }
 
     fn print(&self) {
-        let color = match &self.color {
+        let color = match self.color {
             Color::Blue => "blue",
             Color::Green => "green",
             Color::Red => "red",
         };
-        println!(
-            "Dimensions: {:?}\n Weight: {}\n Color: {}",
-            &self.dimensions, &self.weight, color
-        )
+        self.dimensions.print();
+        println!("Weight: {}\nColor: {}", self.weight, color)
     }
 }
 
 fn main() {
-    let my_box = Box::new((1, 0, 3), 10.0, Color::Green);
+    let my_dimensions = Dimensions {
+        width: 10.0,
+        height: 5.0,
+        depth: 1.5,
+    };
+    let my_box = Box::new(my_dimensions, 10.0, Color::Green);
     my_box.print();
 }
