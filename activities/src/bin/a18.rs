@@ -16,4 +16,34 @@
 //   * For the Ok variant, print any message you want
 //   * For the Err variant, print out the error message
 
-fn main() {}
+#[derive(Debug)]
+struct Adult {
+    name: String,
+    age: i32,
+}
+impl Adult {
+    fn new(name: &str, age: i32) -> Result<Self, String> {
+        if age < 21 {
+            return Err("An adult should be at least 21".to_owned());
+        }
+        Ok(Self {
+            name: name.to_owned(),
+            age,
+        })
+    }
+}
+
+fn main() {
+    let adult = Adult::new("David", 32);
+    let child = Adult::new("Leo", 8);
+
+    print_adult(adult);
+    print_adult(child);
+}
+
+fn print_adult(adult: Result<Adult, String>) {
+    match adult {
+        Ok(adult) => println!("Adult: {:?}", adult),
+        Err(error) => println!("{}", error),
+    }
+}
