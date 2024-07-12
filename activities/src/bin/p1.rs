@@ -60,28 +60,43 @@ struct Bill {
     amount: f64,
 }
 
-fn read_line() -> String {
+fn read_string() -> Option<String> {
     let mut buf = String::new();
     while stdin().read_line(&mut buf).is_err() {
         println!("Please, try again");
     }
-    buf.trim().to_owned()
+    let line = buf.trim();
+    match line {
+        "" => None,
+        _ => Some(line.to_owned()),
+    }
 }
 
-fn read_amount() -> f64 {
+fn read_f64() -> Option<f64> {
     loop {
-        let Ok(value) = read_line().parse::<f64>() else {
-            continue;
+        let line = match read_string() {
+            None => return None,
+            Some(line) => line,
         };
-        return value;
+        let amount: Result<f64, _> = line.parse();
+        match amount {
+            Ok(amount) => return Some(amount),
+            Err(_) => println!("Please, enter a number"),
+        }
     }
 }
 
 fn add_bill(bills: &mut Vec<Bill>) {
     println!("Insert name: ");
-    let name = read_line();
+    let name = match read_string() {
+        Some(line) => line,
+        None => return,
+    };
     println!("Insert amount: ");
-    let amount = read_amount();
+    let amount = match read_f64() {
+        Some(amount) => amount,
+        None => return,
+    };
     let bill = Bill { name, amount };
     println!("Adding {:?} to the bills", bill);
     bills.push(bill);
@@ -99,7 +114,10 @@ fn run() {
     loop {
         use menu::Item;
         menu::show();
-        let input = read_line();
+        let input = match read_string() {
+            Some(value) => value,
+            None => continue,
+        };
         let Some(choice) = Item::from_str(input.as_str()) else {
             println!("Unknown command");
             continue;
