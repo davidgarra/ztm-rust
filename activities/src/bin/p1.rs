@@ -54,6 +54,39 @@ mod menu {
     }
 }
 
+struct Bills {
+    bills: Vec<Bill>,
+}
+
+impl Bills {
+    fn new() -> Bills {
+        Bills { bills: Vec::new() }
+    }
+
+    fn add(&mut self) {
+        println!("Insert name: ");
+        let name = match read_string() {
+            Some(line) => line,
+            None => return,
+        };
+        println!("Insert amount: ");
+        let amount = match read_f64() {
+            Some(amount) => amount,
+            None => return,
+        };
+        let bill = Bill { name, amount };
+        println!("Adding {:?} to the bills", bill);
+        self.bills.push(bill);
+    }
+
+    fn show(&self) {
+        println!("List of bills({}):", self.bills.len());
+        for item in &self.bills {
+            println!("{:?}", item);
+        }
+    }
+}
+
 #[derive(Debug)]
 struct Bill {
     name: String,
@@ -86,31 +119,8 @@ fn read_f64() -> Option<f64> {
     }
 }
 
-fn add_bill(bills: &mut Vec<Bill>) {
-    println!("Insert name: ");
-    let name = match read_string() {
-        Some(line) => line,
-        None => return,
-    };
-    println!("Insert amount: ");
-    let amount = match read_f64() {
-        Some(amount) => amount,
-        None => return,
-    };
-    let bill = Bill { name, amount };
-    println!("Adding {:?} to the bills", bill);
-    bills.push(bill);
-}
-
-fn show_bills(bills: &mut Vec<Bill>) {
-    println!("List of bills({}):", bills.len());
-    for item in bills {
-        println!("{:?}", item);
-    }
-}
-
 fn run() {
-    let mut bills: Vec<Bill> = vec![];
+    let mut bills: Bills = Bills::new();
     loop {
         use menu::Item;
         menu::show();
@@ -123,8 +133,8 @@ fn run() {
             continue;
         };
         match choice {
-            Item::AddBill => add_bill(&mut bills),
-            Item::ShowBills => show_bills(&mut bills),
+            Item::AddBill => bills.add(),
+            Item::ShowBills => bills.show(),
         }
     }
 }
