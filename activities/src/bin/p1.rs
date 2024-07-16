@@ -31,7 +31,51 @@
 
 use std::{collections::HashMap, io::stdin};
 
+#[derive(Debug, Clone)]
+struct Bill {
+    name: String,
+    amount: f64,
+}
+
+struct Bills {
+    bills: HashMap<String, Bill>,
+}
+impl Bills {
+    fn new() -> Bills {
+        Bills {
+            bills: HashMap::new(),
+        }
+    }
+
+    fn add(&mut self, name: &str, amount: f64) -> Option<Bill> {
+        let bill = Bill {
+            name: name.to_string(),
+            amount,
+        };
+        self.bills.insert(name.to_string(), bill)
+    }
+
+    fn remove(&mut self, name: &str) -> Option<Bill> {
+        self.bills.remove(name)
+    }
+
+    fn update(&mut self, name: &str, amount: f64) -> Option<Bill> {
+        let Some(bill) = self.bills.get_mut(name) else {
+            return None;
+        };
+
+        bill.amount = amount;
+        Some(bill.clone())
+    }
+
+    fn get_all(&self) -> Vec<Bill> {
+        self.bills.values().cloned().collect()
+    }
+}
+
 mod menu {
+    use crate::{read_f64, read_string, Bills};
+
     pub enum Item {
         AddBill = 1,
         ShowBills,
@@ -58,61 +102,39 @@ mod menu {
         println!("3) Remove bill");
         println!("4) Edit bill");
     }
-}
 
-struct Bills {
-    bills: HashMap<String, Bill>,
-}
-
-impl Bills {
-    fn new() -> Bills {
-        Bills {
-            bills: HashMap::new(),
-        }
-    }
-
-    fn add(&mut self) {
+    pub fn add_bill(bills: &mut Bills) {
         println!("Insert name: ");
-        let name = match read_string() {
-            Some(line) => line,
-            None => return,
+        let Some(name) = read_string() else {
+            return;
         };
         println!("Insert amount: ");
         let amount = match read_f64() {
             Some(amount) => amount,
             None => return,
         };
-        let bill = Bill {
-            name: name.clone(),
-            amount,
+        println!("Adding bill with name {name} and amount {amount}");
+        match bills.add(&name, amount) {
+            Some(_) => println!("Bill added successfully"),
+            None => println!("Something went wrong"),
         };
-        println!("Adding {:?} to the bills", bill);
-        self.bills.insert(name, bill);
     }
 
-    fn remove(&mut self) {
+    pub fn remove_bill(bills: &mut Bills) {
         println!("Insert name: ");
-        let name = match read_string() {
-            Some(line) => line,
-            None => return,
+        let Some(name) = read_string() else {
+            return;
         };
-        println!("Removing {name} from the bills");
-        if let Some(bill) = self.bills.remove(&name) {
-            println!("Bill {:?} removed", bill);
-        } else {
-            println!("Bill not found");
+        println!("Removing bill with name {name}");
+        match bills.remove(&name) {
+            Some(_) => println!("Bill removed successfully"),
+            None => println!("Bill not found"),
         }
     }
 
-    fn edit(&mut self) {
+    pub fn edit_bill(bills: &mut Bills) {
         println!("Insert name: ");
-        let name = match read_string() {
-            Some(line) => line,
-            None => return,
-        };
-
-        let Some(bill) = self.bills.get_mut(&name) else {
-            println!("Bill {name} not found");
+        let Some(name) = read_string() else {
             return;
         };
 
@@ -121,22 +143,20 @@ impl Bills {
             return;
         };
 
-        println!("Update {name} from the bills");
-        bill.amount = amount;
-    }
-
-    fn show(&self) {
-        println!("List of bills({}):", self.bills.len());
-        for item in &self.bills {
-            println!("{:?}", item);
+        println!("Updating bill with name {name}");
+        match bills.update(&name, amount) {
+            Some(_) => println!("Bill updated successfully"),
+            None => println!("Bill not found"),
         }
     }
-}
 
-#[derive(Debug)]
-struct Bill {
-    name: String,
-    amount: f64,
+    pub fn list_bills(bills: &Bills) {
+        let list = bills.get_all();
+        println!("List of bills({})", list.len());
+        for bill in list {
+            println!("{:?}", bill);
+        }
+    }
 }
 
 fn read_string() -> Option<String> {
@@ -170,19 +190,18 @@ fn run() {
     loop {
         use menu::Item;
         menu::show();
-        let input = match read_string() {
-            Some(value) => value,
-            None => continue,
+        let Some(input) = read_string() else {
+            continue;
         };
         let Some(choice) = Item::from_str(input.as_str()) else {
             println!("Unknown command");
             continue;
         };
         match choice {
-            Item::AddBill => bills.add(),
-            Item::ShowBills => bills.show(),
-            Item::RemoveBills => bills.remove(),
-            Item::EditBills => bills.edit(),
+            Item::AddBill => menu::add_bill(&mut bills),
+            Item::ShowBills => menu::list_bills(&bills),
+            Item::RemoveBills => menu::remove_bill(&mut bills),
+            Item::EditBills => menu::edit_bill(&mut bills),
         }
     }
 }
