@@ -36,6 +36,7 @@ mod menu {
         AddBill = 1,
         ShowBills,
         RemoveBills,
+        EditBills,
     }
     impl Item {
         pub fn from_str(value: &str) -> Option<Self> {
@@ -43,6 +44,7 @@ mod menu {
                 "1" => Some(Item::AddBill),
                 "2" => Some(Item::ShowBills),
                 "3" => Some(Item::RemoveBills),
+                "4" => Some(Item::EditBills),
                 _ => None,
             }
         }
@@ -54,6 +56,7 @@ mod menu {
         println!("1) Add a bill");
         println!("2) Show bills");
         println!("3) Remove bill");
+        println!("4) Edit bill");
     }
 }
 
@@ -99,6 +102,27 @@ impl Bills {
         } else {
             println!("Bill not found");
         }
+    }
+
+    fn edit(&mut self) {
+        println!("Insert name: ");
+        let name = match read_string() {
+            Some(line) => line,
+            None => return,
+        };
+
+        let Some(bill) = self.bills.get_mut(&name) else {
+            println!("Bill {name} not found");
+            return;
+        };
+
+        println!("Insert amount: ");
+        let Some(amount) = read_f64() else {
+            return;
+        };
+
+        println!("Update {name} from the bills");
+        bill.amount = amount;
     }
 
     fn show(&self) {
@@ -158,6 +182,7 @@ fn run() {
             Item::AddBill => bills.add(),
             Item::ShowBills => bills.show(),
             Item::RemoveBills => bills.remove(),
+            Item::EditBills => bills.edit(),
         }
     }
 }
