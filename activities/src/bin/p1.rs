@@ -29,7 +29,7 @@
 // * A vector is the easiest way to store the bills at stage 1, but a
 //   hashmap will be easier to work with at stages 2 and 3.
 
-use std::io::stdin;
+use std::{collections::HashMap, io::stdin};
 
 mod menu {
     pub enum Item {
@@ -58,12 +58,14 @@ mod menu {
 }
 
 struct Bills {
-    bills: Vec<Bill>,
+    bills: HashMap<String, Bill>,
 }
 
 impl Bills {
     fn new() -> Bills {
-        Bills { bills: Vec::new() }
+        Bills {
+            bills: HashMap::new(),
+        }
     }
 
     fn add(&mut self) {
@@ -77,9 +79,12 @@ impl Bills {
             Some(amount) => amount,
             None => return,
         };
-        let bill = Bill { name, amount };
+        let bill = Bill {
+            name: name.clone(),
+            amount,
+        };
         println!("Adding {:?} to the bills", bill);
-        self.bills.push(bill);
+        self.bills.insert(name, bill);
     }
 
     fn remove(&mut self) {
@@ -89,8 +94,8 @@ impl Bills {
             None => return,
         };
         println!("Removing {name} from the bills");
-        if let Some(position) = self.bills.iter().position(|x| x.name == name) {
-            self.bills.remove(position);
+        if let Some(bill) = self.bills.remove(&name) {
+            println!("Bill {:?} removed", bill);
         } else {
             println!("Bill not found");
         }
