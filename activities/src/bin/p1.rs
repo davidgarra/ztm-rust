@@ -35,12 +35,14 @@ mod menu {
     pub enum Item {
         AddBill = 1,
         ShowBills,
+        RemoveBills,
     }
     impl Item {
         pub fn from_str(value: &str) -> Option<Self> {
             match value {
                 "1" => Some(Item::AddBill),
                 "2" => Some(Item::ShowBills),
+                "3" => Some(Item::RemoveBills),
                 _ => None,
             }
         }
@@ -51,6 +53,7 @@ mod menu {
         println!("Make a choice:");
         println!("1) Add a bill");
         println!("2) Show bills");
+        println!("3) Remove bill");
     }
 }
 
@@ -77,6 +80,20 @@ impl Bills {
         let bill = Bill { name, amount };
         println!("Adding {:?} to the bills", bill);
         self.bills.push(bill);
+    }
+
+    fn remove(&mut self) {
+        println!("Insert name: ");
+        let name = match read_string() {
+            Some(line) => line,
+            None => return,
+        };
+        println!("Removing {name} from the bills");
+        if let Some(position) = self.bills.iter().position(|x| x.name == name) {
+            self.bills.remove(position);
+        } else {
+            println!("Bill not found");
+        }
     }
 
     fn show(&self) {
@@ -135,6 +152,7 @@ fn run() {
         match choice {
             Item::AddBill => bills.add(),
             Item::ShowBills => bills.show(),
+            Item::RemoveBills => bills.remove(),
         }
     }
 }
