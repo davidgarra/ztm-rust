@@ -10,7 +10,7 @@
 
 fn main() {
     let data = vec![1, 2, 3, 4, 5];
-    let transformed = data.iter().map(|n| n * 3).filter(|n| n > &10);
+    let transformed: Vec<_> = data.iter().map(|n| n * 3).filter(|n| n > &10).collect();
     for element in transformed {
         println!("{element}");
     }
